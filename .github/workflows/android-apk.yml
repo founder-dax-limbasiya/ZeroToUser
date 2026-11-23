@@ -92,16 +92,8 @@ jobs:
           script: |
             adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb shell am start -W -n com.zerotousers.growth/.MainActivity
-            count=0
-            app_pid=""
-            while [ "$count" -lt 20 ]; do
-              app_pid="$(adb shell pidof com.zerotousers.growth | tr -d '\r')"
-              if [ -n "$app_pid" ]; then break; fi
-              count=$((count + 1))
-              sleep 1
-            done
-            test -n "$app_pid"
-            echo "ZeroToUsers app process: $app_pid"
+            sleep 3
+            adb shell pidof com.zerotousers.growth
             adb exec-out screencap -p > zerotousers-home-smoke.png
             test -s zerotousers-home-smoke.png
 
