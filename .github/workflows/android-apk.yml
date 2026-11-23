@@ -72,15 +72,23 @@ jobs:
           print(f"APK size: {apk.stat().st_size:,} bytes; DEX payload: {dex_bytes:,} bytes")
           PY
 
+      - name: Enable KVM for Android emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+
       - name: Launch app on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
+          emulator-boot-timeout: 600
           arch: x86_64
           target: google_apis
           profile: pixel_2
           disable-animations: true
-          emulator-options: -no-window -no-audio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -camera-back none
           script: |
             adb install -r app/build/outputs/apk/debug/app-debug.apk
             adb shell am start -W -n com.zerotousers.growth/.MainActivity
