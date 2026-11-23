@@ -17,8 +17,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Restore versioned Android source
-        run: base64 -d android-source-v0.3.0.tar.gz.b64 | tar -xz -C .
+      - name: Reassemble and validate Android source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat source-parts/v0.3.0-*.b64 > /tmp/zerotousers-source.b64
+          test "$(wc -c < /tmp/zerotousers-source.b64)" -eq 19296
+          base64 -d /tmp/zerotousers-source.b64 > /tmp/zerotousers-source.tar.gz
+          gzip -t /tmp/zerotousers-source.tar.gz
+          tar -tzf /tmp/zerotousers-source.tar.gz > /tmp/source-file-list.txt
+          grep -q '^app/src/main/java/com/zerotousers/growth/MainActivity.java$' /tmp/source-file-list.txt
+          grep -q '^app/src/main/java/com/zerotousers/growth/Db.java$' /tmp/source-file-list.txt
+          tar -xzf /tmp/zerotousers-source.tar.gz -C .
+          test -s app/src/main/java/com/zerotousers/growth/MainActivity.java
+          test -s app/src/main/java/com/zerotousers/growth/Db.java
+          echo "Validated and restored $(wc -l < /tmp/source-file-list.txt) source files."
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -42,6 +55,7 @@ jobs:
       - name: Verify APK package, dex and signature
         shell: bash
         run: |
+          set -euo pipefail
           APK="app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.zerotousers.growth'"
