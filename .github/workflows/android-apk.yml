@@ -108,8 +108,10 @@ jobs:
             adb shell wm density
             adb shell uiautomator dump /sdcard/window.xml
             adb shell cat /sdcard/window.xml
-            adb shell input tap 460 870
+            adb shell input tap 540 1010
             sleep 2
+            adb shell uiautomator dump /sdcard/window-after.xml
+            adb shell cat /sdcard/window-after.xml | grep -F 'Create a workspace'
             adb exec-out screencap -p > zerotousers-workspace-create.png
             test -s zerotousers-workspace-create.png
 
