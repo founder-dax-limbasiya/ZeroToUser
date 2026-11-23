@@ -17,21 +17,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Reassemble and validate Android source archive
+      - name: Restore and validate Android source archive
         shell: bash
         run: |
           set -euo pipefail
-          cat source-parts/v0.3.0-*.b64 > /tmp/zerotousers-source.b64
-          test "$(wc -c < /tmp/zerotousers-source.b64)" -eq 19296
-          base64 -d /tmp/zerotousers-source.b64 > /tmp/zerotousers-source.tar.gz
+          base64 -d android-source.tar.gz.b64 > /tmp/zerotousers-source.tar.gz
           gzip -t /tmp/zerotousers-source.tar.gz
           tar -tzf /tmp/zerotousers-source.tar.gz > /tmp/source-file-list.txt
-          grep -q '^app/src/main/java/com/zerotousers/growth/MainActivity.java$' /tmp/source-file-list.txt
-          grep -q '^app/src/main/java/com/zerotousers/growth/Db.java$' /tmp/source-file-list.txt
+          echo "Archive entries:"
+          cat /tmp/source-file-list.txt
           tar -xzf /tmp/zerotousers-source.tar.gz -C .
-          test -s app/src/main/java/com/zerotousers/growth/MainActivity.java
-          test -s app/src/main/java/com/zerotousers/growth/Db.java
-          echo "Validated and restored $(wc -l < /tmp/source-file-list.txt) source files."
+          test -s app/src/main/AndroidManifest.xml
+          test -s app/build.gradle
+          echo "Source archive restored successfully."
 
       - name: Set up JDK
         uses: actions/setup-java@v4
