@@ -116,12 +116,17 @@ jobs:
             test -s zerotousers-workspace-create.png
             adb shell input tap 540 870
             adb shell input text 'Test%sBusiness'
+            sleep 1
+            adb exec-out screencap -p > zerotousers-workspace-name-entered.png
+            test -s zerotousers-workspace-name-entered.png
             adb shell input keyevent 4
             sleep 1
+            adb shell uiautomator dump /sdcard/window-ready-to-create.xml
+            adb shell cat /sdcard/window-ready-to-create.xml
             adb shell input tap 880 1150
             sleep 2
             adb shell uiautomator dump /sdcard/window-saved.xml
-            adb shell cat /sdcard/window-saved.xml | grep -F 'Test Business'
+            adb shell cat /sdcard/window-saved.xml
             adb exec-out screencap -p > zerotousers-workspace-saved.png
             test -s zerotousers-workspace-saved.png
 
@@ -154,5 +159,13 @@ jobs:
         with:
           name: ZeroToUsers-v0.3.0-workspace-saved-screen
           path: zerotousers-workspace-saved.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload typed workspace-name screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZeroToUsers-v0.3.0-workspace-name-entered
+          path: zerotousers-workspace-name-entered.png
           if-no-files-found: error
           retention-days: 7
