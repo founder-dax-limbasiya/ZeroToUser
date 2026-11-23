@@ -96,6 +96,10 @@ jobs:
             adb shell pidof com.zerotousers.growth
             adb exec-out screencap -p > zerotousers-home-smoke.png
             test -s zerotousers-home-smoke.png
+            adb shell input tap 460 870
+            sleep 2
+            adb exec-out screencap -p > zerotousers-workspace-create.png
+            test -s zerotousers-workspace-create.png
 
       - name: Upload tested APK
         uses: actions/upload-artifact@v4
@@ -110,5 +114,13 @@ jobs:
         with:
           name: ZeroToUsers-v0.3.0-emulator-screenshot
           path: zerotousers-home-smoke.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload workspace-create interaction screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZeroToUsers-v0.3.0-workspace-create-screen
+          path: zerotousers-workspace-create.png
           if-no-files-found: error
           retention-days: 7
