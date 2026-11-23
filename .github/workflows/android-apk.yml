@@ -104,6 +104,10 @@ jobs:
             adb shell pidof com.zerotousers.growth
             adb exec-out screencap -p > zerotousers-home-smoke.png
             test -s zerotousers-home-smoke.png
+            adb shell wm size
+            adb shell wm density
+            adb shell uiautomator dump /sdcard/window.xml
+            adb shell cat /sdcard/window.xml
             adb shell input tap 460 870
             sleep 2
             adb exec-out screencap -p > zerotousers-workspace-create.png
