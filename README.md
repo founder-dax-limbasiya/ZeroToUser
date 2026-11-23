@@ -1,25 +1,29 @@
 # ZeroToUsers — Android growth workspace
 
-Android-first, free-first workspace for managing multiple small businesses independently.
+A free-first, local-first Android app for founders and small businesses. One installation can hold multiple business workspaces, with each workspace's records kept separate on the device.
 
-## Current repository build status
+## v0.3.0 scope
 
-The APK artifact previously built from this repository was a very small prototype, not a complete customer-growth app. Do not treat that artifact as a finished release. A larger local-first rebuild is being prepared and must be committed, compiled and tested before a replacement APK is shared.
+- Multiple business workspaces
+- Customer discovery shortcuts for Google, Reddit, YouTube, Quora, LinkedIn and Product Hunt
+- Customer-problem / insight notebook
+- Content planner with share-sheet handoff
+- Lead pipeline with search, stages and phone/email/browser handoff
+- Manual DM/comment follow-up tracker
+- Reusable reply templates
+- Weekly growth checklist
+- Social profile directory (labels only)
+- CSV export for one active workspace
+- SQLite persistence; no paid backend, AI API, sign-in or remote analytics
 
-## Intended product scope
+## Honest platform status
 
-- Separate workspaces for each business
-- Customer research and insight notebook
-- Content planner and share-sheet handoff
-- Lead pipeline and manual conversation follow-up
-- Reusable reply templates and a growth checklist
-- CSV export
-- No AI service or paid backend
+This release does **not** connect social accounts, auto-publish posts, sync DMs/comments, scrape communities or send automatic replies. Those features need official platform APIs, developer app registration, user permission and sometimes platform review. This app does not use private endpoints or bypass platform rules.
 
-## Platform integration limits
+Data stays on the phone. Export a workspace before uninstalling or clearing app data. CSV files are plain text and should be stored carefully.
 
-This app must not claim live social integrations until official platform APIs, permissions and account authorisation are implemented and tested. No private endpoints or platform-rule bypasses will be used.
+## Build and smoke test
 
-## Build
+GitHub Actions compiles the APK, checks the Android package contents and debug signature, then installs and launches the app in an Android emulator. The APK is uploaded only after those checks pass.
 
-GitHub Actions builds a debug APK from the source archive on pushes to `main`. JDK 17, Android Gradle Plugin 8.10.1, Gradle 8.13 and Android SDK 36 are used.
+Toolchain: JDK 17, Android Gradle Plugin 8.10.1, Gradle 8.13, Android SDK 36.
