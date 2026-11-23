@@ -1,27 +1,25 @@
 # ZeroToUsers — Android growth workspace
 
-ZeroToUsers is a local-first Android tool for small-business founders. It keeps several business workspaces separate and gives each one a practical place to research customer problems, plan content, track leads, organise manual conversation follow-ups and run a weekly growth checklist.
+Android-first, free-first workspace for managing multiple small businesses independently.
 
-## Features in this build
+## Current repository build status
 
-- Multiple business workspaces, with records scoped by `business_id`
-- Customer discovery launcher for Google, Reddit, YouTube, Quora, LinkedIn and Product Hunt searches
-- Customer insight notebook for recurring problems, quotes and unmet needs
-- Content drafts with target platform/date and Android share-sheet handoff
-- Lead pipeline with stages, search/filter and contact handoff to phone/email/browser apps
-- Manual DM/comment follow-up log and reusable reply templates
-- Per-business growth checklist with completion state
-- Social profile directory (labels only)
-- CSV export for the active workspace
-- SQLite persistence, foreign keys and an upgrade path for existing local databases
-- No AI APIs, paid backend, analytics SDK, account sign-up or subscription
+The APK artifact previously built from this repository was a very small prototype, not a complete customer-growth app. Do not treat that artifact as a finished release. A larger local-first rebuild is being prepared and must be committed, compiled and tested before a replacement APK is shared.
 
-## Important boundaries
+## Intended product scope
 
-This build does not connect social accounts, auto-publish in the background, sync comments/DMs, scrape communities or send automatic replies. Live social actions require official platform APIs, app registration, user authorisation and sometimes review. This app does not use private endpoints or bypass platform rules.
+- Separate workspaces for each business
+- Customer research and insight notebook
+- Content planner and share-sheet handoff
+- Lead pipeline and manual conversation follow-up
+- Reusable reply templates and a growth checklist
+- CSV export
+- No AI service or paid backend
 
-The app currently stores data only on the device. Export a CSV before uninstalling or clearing app data. CSV exports are plain text and should be stored securely.
+## Platform integration limits
+
+This app must not claim live social integrations until official platform APIs, permissions and account authorisation are implemented and tested. No private endpoints or platform-rule bypasses will be used.
 
 ## Build
 
-GitHub Actions builds a debug APK on pushes to `main`. The project uses JDK 17, Android Gradle Plugin 8.10.1, Gradle 8.13 and Android SDK 36.
+GitHub Actions builds a debug APK from the source archive on pushes to `main`. JDK 17, Android Gradle Plugin 8.10.1, Gradle 8.13 and Android SDK 36 are used.
