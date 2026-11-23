@@ -1,4 +1,4 @@
-name: Build ZeroToUsers Android APK
+name: Build and smoke-test ZeroToUsers APK
 
 on:
   workflow_dispatch:
@@ -10,15 +10,15 @@ permissions:
   actions: read
 
 jobs:
-  build-apk:
+  build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Restore Android source
-        run: tar -xzf android-source.tar.gz -C .
+      - name: Restore versioned Android source
+        run: base64 -d android-source-v0.3.0.tar.gz.b64 | tar -xz -C .
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -37,12 +37,61 @@ jobs:
           gradle-version: '8.13'
 
       - name: Build debug APK
-        run: gradle assembleDebug --no-daemon --stacktrace
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK
+      - name: Verify APK package, dex and signature
+        shell: bash
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.zerotousers.growth'"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+          python - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          apk = Path("app/build/outputs/apk/debug/app-debug.apk")
+          with ZipFile(apk) as z:
+              names = set(z.namelist())
+              assert "AndroidManifest.xml" in names
+              assert "classes.dex" in names
+              assert "resources.arsc" in names
+              dex_bytes = sum(info.file_size for info in z.infolist() if info.filename.endswith(".dex"))
+              assert dex_bytes > 30000, f"DEX payload unexpectedly small: {dex_bytes}"
+          print(f"APK size: {apk.stat().st_size:,} bytes; DEX payload: {dex_bytes:,} bytes")
+          PY
+
+      - name: Launch app on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -no-audio -no-boot-anim
+          script: |
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            adb shell am start -W -n com.zerotousers.growth/.MainActivity
+            for i in {1..20}; do
+              if adb shell pidof com.zerotousers.growth >/dev/null; then break; fi
+              sleep 1
+            done
+            adb shell pidof com.zerotousers.growth
+            adb exec-out screencap -p > zerotousers-home-smoke.png
+            test -s zerotousers-home-smoke.png
+
+      - name: Upload tested APK
         uses: actions/upload-artifact@v4
         with:
-          name: ZeroToUsers-debug-apk
+          name: ZeroToUsers-v0.3.0-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Upload emulator screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZeroToUsers-v0.3.0-emulator-screenshot
+          path: zerotousers-home-smoke.png
+          if-no-files-found: error
+          retention-days: 7
